@@ -5,7 +5,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -13,18 +12,11 @@ import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
-import com.joshuamc.ejercicio2_2.Objeto.Objeto;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class ActivityConsultar extends AppCompatActivity {
     EditText txtID;
@@ -47,27 +39,19 @@ public class ActivityConsultar extends AppCompatActivity {
         if (txtID.getText().length() > 0){
             String URL = "https://jsonplaceholder.typicode.com/todos?id=" + txtID.getText();
             JsonArrayRequest jsonRequest = new JsonArrayRequest(Request.Method.GET, URL, null,
-                    new Response.Listener<JSONArray>(){
-                        @Override
-                        public void onResponse(JSONArray response) {
-                            if (response.length() > 0) {
-                                try {
-                                    JSONObject objeto = response.getJSONObject(0);
-                                    String info = "userID: " + objeto.get("userId") + "\nID: " + objeto.get("id") +
-                                            "\nTitle: " + objeto.get("title") + "\nCompleted: " + objeto.get("completed");
-                                    txtInformacion.setText(info);
-                                } catch (JSONException e) {
-                                    message(e.getMessage());
-                                }
+                    response -> {
+                        if (response.length() > 0) {
+                            try {
+                                JSONObject objeto = response.getJSONObject(0);
+                                String info = "userID: " + objeto.get("userId") + "\nID: " + objeto.get("id") +
+                                        "\nTitle: " + objeto.get("title") + "\nCompleted: " + objeto.get("completed");
+                                txtInformacion.setText(info);
+                            } catch (JSONException e) {
+                                message(e.getMessage());
                             }
                         }
                     },
-                    new Response.ErrorListener(){
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            message(error.getMessage());
-                        }
-                    }
+                    error -> message(error.getMessage())
             );
             requestQueue.add(jsonRequest);
         } else message("Debe ingresar un ID");

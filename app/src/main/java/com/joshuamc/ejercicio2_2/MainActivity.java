@@ -12,13 +12,10 @@ import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
 import com.joshuamc.ejercicio2_2.Objeto.Objeto;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -29,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
     ListView lista;
     Button activityBuscar;
     RequestQueue requestQueue;
-    List<String> argDatos = new ArrayList<String>();
+    List<String> argDatos = new ArrayList<>();
     private static final String URL = "https://jsonplaceholder.typicode.com/todos";
 
     @Override
@@ -56,34 +53,26 @@ public class MainActivity extends AppCompatActivity {
 
     private void jsonRequest(){
         JsonArrayRequest jsonRequest = new JsonArrayRequest(Request.Method.GET, URL, null,
-                new Response.Listener<JSONArray>(){
-                    @Override
-                    public void onResponse(JSONArray response) {
-                        if (response.length() > 0) {
-                            for (int i = 0; i < response.length(); i++) {
-                                try {
-                                    JSONObject objeto = response.getJSONObject(i);
-                                    Objeto obj = new Objeto();
-                                    obj.setUserId(Integer.parseInt(objeto.get("userId").toString()));
-                                    obj.setId(Integer.parseInt(objeto.get("id").toString()));
-                                    obj.setTitle(objeto.get("title").toString());
-                                    obj.setBodycompleted(objeto.get("completed").toString());
-                                    argDatos.add("UserId: "+obj.getUserId() + "\nID: " + obj.getId() + "\nTitle:" + obj.getTitle() + "\nCompleted: " + obj.getBodycompleted());
-                                    ArrayAdapter adp = new ArrayAdapter(getApplicationContext(), android.R.layout.simple_list_item_1, argDatos);
-                                    lista.setAdapter(adp);
-                                } catch (JSONException e) {
-                                    message(e.getMessage());
-                                }
+                response -> {
+                    if (response.length() > 0) {
+                        for (int i = 0; i < response.length(); i++) {
+                            try {
+                                JSONObject objeto = response.getJSONObject(i);
+                                Objeto obj = new Objeto();
+                                obj.setUserId(Integer.parseInt(objeto.get("userId").toString()));
+                                obj.setId(Integer.parseInt(objeto.get("id").toString()));
+                                obj.setTitle(objeto.get("title").toString());
+                                obj.setBodycompleted(objeto.get("completed").toString());
+                                argDatos.add("UserId: "+obj.getUserId() + "\nID: " + obj.getId() + "\nTitle: " + obj.getTitle() + "\nCompleted: " + obj.getBodycompleted());
+                                ArrayAdapter<String> adp = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_list_item_1, argDatos);
+                                lista.setAdapter(adp);
+                            } catch (JSONException e) {
+                                message(e.getMessage());
                             }
                         }
                     }
                 },
-                new Response.ErrorListener(){
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        message(error.getMessage());
-                    }
-                }
+                error -> message(error.getMessage())
         );
         requestQueue.add(jsonRequest);
     }
